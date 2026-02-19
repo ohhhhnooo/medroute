@@ -6,11 +6,25 @@ import { CallQueue } from "@/components/features/calls/CallQueue";
 import { CallDetails } from "@/components/features/calls/CallDetails";
 import { useRealtimeUpdates } from "@/features/calls/hooks";
 import { useCallsStore } from "@/features/calls/store";
-import { TEXT } from "@/lib/constants/text";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { RefreshCw, User } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuthStore } from "@/features/auth/store";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   // Initialize real-time updates
   useRealtimeUpdates();
+
+  const { dispatcher, logout } = useAuthStore();
+  const router = useRouter();
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -55,18 +69,65 @@ export default function DashboardPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
+  const handleRefresh = () => {
+    useCallsStore.getState().initialize();
+  };
+
   return (
     <AppShell>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-73px)]">
-        {/* LEFT: Call Queue */}
-        <div className="border-r border-border overflow-y-auto p-6">
-          <h2 className="text-xl font-semibold mb-4">Очередь вызовов</h2>
-          <CallQueue />
-        </div>
+      {/* Strong Header Bar */}
+      <div className="border-b border-border bg-card shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h1 className="font-semibold text-xl">Главный экран вызовов</h1>
+              <Badge variant="secondary">AI онлайн</Badge>
+            </div>
 
-        {/* RIGHT: Call Details */}
-        <div className="overflow-y-auto p-6">
-          <h2 className="text-xl font-semibold mb-4">Детали вызова</h2>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" onClick={handleRefresh}>
+                <RefreshCw className="size-4 mr-2" />
+                Обновить
+              </Button>
+
+              {dispatcher && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <User className="size-4 mr-2" />
+                      {dispatcher.name}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem disabled>
+                      <span className="text-sm text-muted-foreground">
+                        Диспетчер: {dispatcher.name}
+                      </span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      Выход
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content - Dense Grid Layout */}
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6">
+          {/* LEFT COLUMN - Call Queue */}
+          <CallQueue />
+
+          {/* RIGHT COLUMN - Call Details */}
           <CallDetails />
         </div>
       </div>

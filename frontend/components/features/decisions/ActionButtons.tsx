@@ -1,11 +1,11 @@
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Check, Edit, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallsStore } from "@/features/calls/store";
 import { TEXT } from "@/lib/constants/text";
+import { Check, Edit, Clock } from "lucide-react";
 
 interface ActionButtonsProps {
   callId: string;
@@ -28,41 +28,50 @@ export function ActionButtons({ callId }: ActionButtonsProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{TEXT.DASHBOARD.ACTIONS}</CardTitle>
+    <Card className="shadow-sm">
+      <CardHeader className="border-b border-border">
+        <CardTitle className="text-base">{TEXT.DASHBOARD.ACTIONS}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-3">
+      <CardContent className="pt-6">
+        {/* Primary Action */}
+        <Button
+          onClick={handleAccept}
+          disabled={isLoading}
+          className="w-full mb-3"
+          size="lg"
+        >
+          <Check className="size-4 mr-2" />
+          {TEXT.ACTIONS.ACCEPT}
+        </Button>
+
+        {/* Secondary Actions Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
           <Button
-            onClick={handleAccept}
+            variant="outline"
+            onClick={handleOverride}
             disabled={isLoading}
-            size="lg"
-            className="w-full"
           >
-            <Check className="size-4 mr-2" />
-            {TEXT.ACTIONS.ACCEPT}
+            <Edit className="size-3 mr-2" />
+            <span className="text-xs">{TEXT.ACTIONS.OVERRIDE}</span>
           </Button>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              onClick={handleOverride}
-              disabled={isLoading}
-            >
-              <Edit className="size-4 mr-2" />
-              {TEXT.ACTIONS.OVERRIDE}
-            </Button>
+          <Button
+            variant="outline"
+            onClick={handlePostpone}
+            disabled={isLoading}
+          >
+            <Clock className="size-3 mr-2" />
+            <span className="text-xs">{TEXT.ACTIONS.POSTPONE}</span>
+          </Button>
+        </div>
 
-            <Button
-              variant="outline"
-              onClick={handlePostpone}
-              disabled={isLoading}
-            >
-              <Clock className="size-4 mr-2" />
-              {TEXT.ACTIONS.POSTPONE}
-            </Button>
-          </div>
+        {/* Keyboard Shortcuts */}
+        <div className="pt-3 border-t border-border">
+          <p className="text-xs text-muted-foreground text-center">
+            <kbd className="px-1.5 py-0.5 bg-secondary rounded text-xs">Ctrl+A</kbd> принять •{" "}
+            <kbd className="px-1.5 py-0.5 bg-secondary rounded text-xs">Ctrl+O</kbd> изменить •{" "}
+            <kbd className="px-1.5 py-0.5 bg-secondary rounded text-xs">Ctrl+P</kbd> отложить
+          </p>
         </div>
       </CardContent>
     </Card>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils/format";
 
 interface CallTimerProps {
@@ -22,10 +21,5 @@ export function CallTimer({ startTime }: CallTimerProps) {
     return () => clearInterval(interval);
   }, [startTime]);
 
-  return (
-    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-      <Clock className="size-3.5" />
-      {elapsed}
-    </div>
-  );
+  return <span>{elapsed}</span>;
 }
